@@ -25,12 +25,30 @@ namespace TnOutlookWebApp.Controllers
         {
             if (!InitializeHelpers())
                 return "Initialize helpers fail";
-            var invitedManMail = crmHelper.GetInvitedMailById(appointmentEntity.InviteManId);
-            appointmentEntity.OutlookId = exchangeHelper.CreateNewOutlookAppointment(appointmentEntity, invitedManMail);
-            azureHelper.CreateAppointmentRecord(appointmentEntity, tasksTableName);
+            appointmentEntity.OutlookId = exchangeHelper.CreateNewOutlookAppointment(appointmentEntity);
+            //azureHelper.CreateAppointmentRecord(appointmentEntity, tasksTableName);
             return appointmentEntity.OutlookId;
         }
 
+        [HttpPost]
+        public string UpdateAppointmentInOutlook(AppointmentEntity appointmentEntity)
+        {
+            if (!InitializeHelpers())
+                return "Initialize helpers fail";
+            string outlookAppointmentId = azureHelper.
+        }
+
+        [HttpPost]
+        public string UpdateAppointmentInCrm(string outlookId)
+        {
+            if (!InitializeHelpers())
+                return "Initialize helpers fail";
+            AppointmentEntity outlookAppointment = exchangeHelper.GetAppointmentFromOutlook(outlookId);
+            outlookAppointment.CrmId = azureHelper.GetCrmAppointmentIdByOutlookId(outlookAppointment, tasksTableName);
+            string result = crmHelper.UpdateCrmAppointment(outlookAppointment);
+            azureHelper.UpdateAppointmentRecord(outlookAppointment, tasksTableName);
+            return "Success update";
+        }
         private bool InitializeHelpers()
         {
             if (exchangeHelper == null)
@@ -45,6 +63,8 @@ namespace TnOutlookWebApp.Controllers
             else
                 return false;
         }
+
+
 
     }
 }

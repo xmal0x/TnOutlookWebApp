@@ -58,6 +58,11 @@ namespace TnOutlookWebApp.Models
             return value;
         }
 
+        internal string UpdateCrmAppointment(AppointmentEntity outlookAppointment)
+        {
+            throw new NotImplementedException();
+        }
+
         internal string UpdateCrmTask(TaskEntity outlookTask)
         {
             var crmTaskId = outlookTask.CrmId;

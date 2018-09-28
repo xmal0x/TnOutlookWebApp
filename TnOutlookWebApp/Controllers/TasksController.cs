@@ -32,10 +32,24 @@ namespace TnOutlookWebApp.Controllers
         }
 
         [HttpPost]
+        public string UpdateTaskInCrm(string outlookId)
+        {
+            //Task task = Task.Bind();
+
+            if (!InitializeHelpers())
+                return "Error";
+            TaskEntity outlookTask = exchangeHelper.GetTaskFromOutlook(outlookId);
+            outlookTask.CrmId = azureHelper.GetCrmTaskIdByOutlookId(outlookTask, tasksTableName);
+            string result = crmHelper.UpdateCrmTask(outlookTask);
+            azureHelper.UpdateTaskRecord(outlookTask, tasksTableName);
+            return "result";
+        }
+
+        [HttpPost]
         public string UpdateTaskInOutlook(TaskEntity taskEntity)
         {
             if (!InitializeHelpers())
-                return "Error";
+                return "Initialize helpers fail";
             string outlookTaskId = azureHelper.GetOutlookTaskId(taskEntity, tasksTableName);
             if(taskEntity.NewTaskOwnerId == Guid.Empty)
             {
@@ -54,20 +68,6 @@ namespace TnOutlookWebApp.Controllers
                 exchangeHelper.DeleteOutlookTaskById(oldOutlookIdForDelete);
             }
             return "Update success";            
-        }
-
-        [HttpPost]
-        public string UpdateTaskInCrm(string outlookId)
-        {
-            //Task task = Task.Bind();
-
-            if (!InitializeHelpers())
-                return "Error";
-            TaskEntity outlookTask = exchangeHelper.GetTaskFromOutlook(outlookId);
-            outlookTask.CrmId = azureHelper.GetCrmTaskIdByOutlookId(outlookTask, tasksTableName);
-            string result = crmHelper.UpdateCrmTask(outlookTask);
-            azureHelper.UpdateTaskRecord(outlookTask, tasksTableName);
-            return "result";
         }
 
         private bool InitializeHelpers()

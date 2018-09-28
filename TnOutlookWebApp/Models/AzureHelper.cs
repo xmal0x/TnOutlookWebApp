@@ -46,6 +46,20 @@ namespace TnOutlookWebApp.Models
             throw new NotImplementedException();
         }
 
+        internal string GetOutlookAppointmentId(AppointmentEntity appointmentEntity, string tableName)
+        {
+            var table = tableClient.GetTableReference(tableName);
+
+            TableQuery<AzureTaskEntity> query = new TableQuery<AzureTaskEntity>().Where(TableQuery.GenerateFilterCondition("CrmId", QueryComparisons.Equal, appointmentEntity.CrmId.ToString()));
+
+            var azureEntity = table.ExecuteQuery(query).FirstOrDefault();
+            if (azureEntity != null)
+            {
+                return azureEntity.OutlookId;
+            }
+            return "Error";
+        }
+
         internal string GetOutlookTaskId(TaskEntity taskEntity, string tableName)
         {
             var table = tableClient.GetTableReference(tableName);
@@ -58,6 +72,16 @@ namespace TnOutlookWebApp.Models
                return azureEntity.OutlookId;
             }
             return "Error";
+        }
+
+        internal void UpdateAppointmentRecord(AppointmentEntity outlookAppointment, string tasksTableName)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Guid GetCrmAppointmentIdByOutlookId(AppointmentEntity outlookAppointment, string tasksTableName)
+        {
+            throw new NotImplementedException();
         }
 
         internal void UpdateTaskRecord(TaskEntity updateTask, string tableName)

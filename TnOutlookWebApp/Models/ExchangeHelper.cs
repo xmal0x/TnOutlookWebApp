@@ -29,16 +29,23 @@ namespace TnOutlookWebApp.Models
                 DueDate = taskEntity.DuoDate                
             };
             outlookTask.Save(new FolderId(WellKnownFolderName.Tasks, ownerUserMail));
-            return outlookTask.Id.ToString();
+            return outlookTask.Id.UniqueId;
         }
 
-        internal string CreateNewOutlookAppointment(AppointmentEntity appointmentEntity, object invitedManMail)
+        internal string CreateNewOutlookAppointment(AppointmentEntity appointmentEntity)
         {
             Appointment appointment = new Appointment(exchangeService)
             {
-                //Start = 
+                Start = appointmentEntity.Start,
+                End = appointmentEntity.End,
+                Subject = appointmentEntity.Subject,
+                Body = new MessageBody(BodyType.Text, appointmentEntity.Body),
+                Location = appointmentEntity.Location,                
             };
-            return "";
+            foreach (var attendees in appointmentEntity.RequiredAttendeesEmails)
+                appointment.RequiredAttendees.Add(attendees);
+            appointment.Save(SendInvitationsMode.SendToAllAndSaveCopy);
+            return appointment.Id.UniqueId;
         }
 
         internal string UpdateOutlookTask(TaskEntity taskEntity, string outlookTaskId)
@@ -96,6 +103,11 @@ namespace TnOutlookWebApp.Models
                     break;
             }
             return task;
+        }
+
+        internal AppointmentEntity GetAppointmentFromOutlook(string outlookId)
+        {
+            throw new NotImplementedException();
         }
 
         private bool RedirectionUrlValidationCallback(String redirectionUrl)
