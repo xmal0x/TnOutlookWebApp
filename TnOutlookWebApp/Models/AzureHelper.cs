@@ -46,11 +46,11 @@ namespace TnOutlookWebApp.Models
             throw new NotImplementedException();
         }
 
-        internal string GetOutlookAppointmentId(AppointmentEntity appointmentEntity, string tableName)
+        internal string GetOutlookAppointmentIdByCrm(AppointmentEntity entity, string tableName)
         {
             var table = tableClient.GetTableReference(tableName);
 
-            TableQuery<AzureTaskEntity> query = new TableQuery<AzureTaskEntity>().Where(TableQuery.GenerateFilterCondition("CrmId", QueryComparisons.Equal, appointmentEntity.CrmId.ToString()));
+            TableQuery<AppointmentEntity> query = new TableQuery<AppointmentEntity>().Where(TableQuery.GenerateFilterCondition("CrmId", QueryComparisons.Equal, entity.CrmId.ToString()));
 
             var azureEntity = table.ExecuteQuery(query).FirstOrDefault();
             if (azureEntity != null)

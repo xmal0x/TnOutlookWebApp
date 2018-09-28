@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Microsoft.WindowsAzure.Storage.Table;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
 namespace TnOutlookWebApp.Models
 {
-    public class AppointmentEntity
+    public class AppointmentEntity :TableEntity
     {
         public Guid InviteManId { get; set; }
         public string OutlookId { get; set; }

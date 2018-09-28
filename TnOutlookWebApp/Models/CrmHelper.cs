@@ -32,11 +32,6 @@ namespace TnOutlookWebApp.Models
                 null, clientCredentials, null);
         }
 
-        internal object GetInvitedMailById(Guid guid)
-        {
-            return GetFieldValueFromEntity("contact", "emailaddress1", guid);
-        }
-
         public string GetUserMailByGuid(Guid guid)
         {
             return GetFieldValueFromEntity("systemuser", "regardingobjectid", guid);

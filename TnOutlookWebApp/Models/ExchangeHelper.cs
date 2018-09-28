@@ -44,7 +44,7 @@ namespace TnOutlookWebApp.Models
             };
             foreach (var attendees in appointmentEntity.RequiredAttendeesEmails)
                 appointment.RequiredAttendees.Add(attendees);
-            appointment.Save(SendInvitationsMode.SendToAllAndSaveCopy);
+            appointment.Save(SendInvitationsMode.SendToAllAndSaveCopy);            
             return appointment.Id.UniqueId;
         }
 

@@ -35,7 +35,8 @@ namespace TnOutlookWebApp.Controllers
         {
             if (!InitializeHelpers())
                 return "Initialize helpers fail";
-            string outlookAppointmentId = azureHelper.
+            //string outlookAppointmentId = azureHelper.
+            return "";
         }
 
         [HttpPost]
