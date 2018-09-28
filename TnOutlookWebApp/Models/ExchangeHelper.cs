@@ -32,6 +32,15 @@ namespace TnOutlookWebApp.Models
             return outlookTask.Id.ToString();
         }
 
+        internal string CreateNewOutlookAppointment(AppointmentEntity appointmentEntity, object invitedManMail)
+        {
+            Appointment appointment = new Appointment(exchangeService)
+            {
+                //Start = 
+            };
+            return "";
+        }
+
         internal string UpdateOutlookTask(TaskEntity taskEntity, string outlookTaskId)
         {
             Task outlookTask = Task.Bind(exchangeService, new ItemId(outlookTaskId));

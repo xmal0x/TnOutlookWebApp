@@ -1,11 +1,6 @@
-﻿using Microsoft.Exchange.WebServices.Data;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Configuration;
-using System.Linq;
-using System.Web;
 using System.Web.Http;
-//using System.Web.Mvc;
 using TnOutlookWebApp.Models;
 
 namespace TnOutlookWebApp.Controllers
@@ -28,7 +23,7 @@ namespace TnOutlookWebApp.Controllers
         public string CreateTaskInOutlook(TaskEntity taskEntity)
         {
             if (!InitializeHelpers())
-                return "Error";
+                return "Initialize helpers fail";
             string newOwnerMail = crmHelper.GetUserMailByGuid(taskEntity.NewTaskOwnerId);
             taskEntity.OutlookId = exchangeHelper.CreateNewOutlookTask(taskEntity, newOwnerMail);
 

@@ -41,6 +41,11 @@ namespace TnOutlookWebApp.Models
             table.Execute(insertOperation);
         }
 
+        internal void CreateAppointmentRecord(AppointmentEntity appointmentEntity, string tasksTableName)
+        {
+            throw new NotImplementedException();
+        }
+
         internal string GetOutlookTaskId(TaskEntity taskEntity, string tableName)
         {
             var table = tableClient.GetTableReference(tableName);

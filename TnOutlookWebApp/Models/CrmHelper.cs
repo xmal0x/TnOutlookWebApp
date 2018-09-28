@@ -32,13 +32,30 @@ namespace TnOutlookWebApp.Models
                 null, clientCredentials, null);
         }
 
+        internal object GetInvitedMailById(Guid guid)
+        {
+            return GetFieldValueFromEntity("contact", "emailaddress1", guid);
+        }
+
         public string GetUserMailByGuid(Guid guid)
         {
+            return GetFieldValueFromEntity("systemuser", "regardingobjectid", guid);
+            /*
             string email = string.Empty;
             var user = organizationService.Retrieve("systemuser", guid, new ColumnSet("internalemailaddress"));
             if (user != null)
                 email = user["internalemailaddress"].ToString();
             return email;
+            */
+        }
+
+        private string GetFieldValueFromEntity(string entityLogicalName, string fieldName, Guid guid)
+        {
+            string value = null;
+            var entity = organizationService.Retrieve(entityLogicalName, guid, new ColumnSet(fieldName));
+            if (entity != null)
+                value = entity[fieldName].ToString();
+            return value;
         }
 
         internal string UpdateCrmTask(TaskEntity outlookTask)
