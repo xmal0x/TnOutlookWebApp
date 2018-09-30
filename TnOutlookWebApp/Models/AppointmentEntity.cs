@@ -8,9 +8,14 @@ namespace TnOutlookWebApp.Models
 {
     public class AppointmentEntity :TableEntity
     {
-        public Guid InviteManId { get; set; }
+        public AppointmentEntity()
+        {
+            this.PartitionKey = DateTime.Now.ToString("yyyyMM");
+            this.RowKey = DateTime.Now.Ticks.ToString();
+        }
+
         public string OutlookId { get; set; }
-        public Guid CrmId { get; set; }
+        public string CrmId { get; set; }
         public List<string> RequiredAttendeesEmails { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }

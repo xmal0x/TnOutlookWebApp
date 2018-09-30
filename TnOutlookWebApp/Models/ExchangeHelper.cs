@@ -48,6 +48,23 @@ namespace TnOutlookWebApp.Models
             return appointment.Id.UniqueId;
         }
 
+        internal string UpdateOutlookAppointment(AppointmentEntity appointmentEntity)
+        {
+            Appointment outlookAppointment = Appointment.Bind(exchangeService, appointmentEntity.OutlookId);
+            if (!string.IsNullOrEmpty(appointmentEntity.Location))
+                outlookAppointment.Location = appointmentEntity.Location;
+            if (!string.IsNullOrEmpty(appointmentEntity.Subject))
+                outlookAppointment.Subject = appointmentEntity.Subject;
+            if (!string.IsNullOrEmpty(appointmentEntity.Body))
+                outlookAppointment.Body = appointmentEntity.Body;
+            if (appointmentEntity.Start != null)
+                outlookAppointment.Start = appointmentEntity.Start;
+            if (appointmentEntity.End != null)
+                outlookAppointment.End = appointmentEntity.End;
+            outlookAppointment.Update(ConflictResolutionMode.AlwaysOverwrite);
+            return "Appointment update success";
+        }
+
         internal string UpdateOutlookTask(TaskEntity taskEntity, string outlookTaskId)
         {
             Task outlookTask = Task.Bind(exchangeService, new ItemId(outlookTaskId));

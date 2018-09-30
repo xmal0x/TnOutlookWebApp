@@ -41,16 +41,20 @@ namespace TnOutlookWebApp.Models
             table.Execute(insertOperation);
         }
 
-        internal void CreateAppointmentRecord(AppointmentEntity appointmentEntity, string tasksTableName)
+        internal void CreateAppointmentRecord(AppointmentEntity appointmentEntity, string tableName)
         {
-            throw new NotImplementedException();
+            var table = tableClient.GetTableReference(tableName);
+            table.CreateIfNotExists();
+            appointmentEntity.PartitionKey = appointmentEntity.Start.ToString("yyyyMM");
+            var insertOpperation = TableOperation.Insert(appointmentEntity);
+            table.Execute(insertOpperation);
         }
 
-        internal string GetOutlookAppointmentIdByCrm(AppointmentEntity entity, string tableName)
+        internal string GetOutlookAppointmentIdByCrmId(AppointmentEntity entity, string tableName)
         {
             var table = tableClient.GetTableReference(tableName);
 
-            TableQuery<AppointmentEntity> query = new TableQuery<AppointmentEntity>().Where(TableQuery.GenerateFilterCondition("CrmId", QueryComparisons.Equal, entity.CrmId.ToString()));
+            TableQuery<AppointmentEntity> query = new TableQuery<AppointmentEntity>().Where(TableQuery.GenerateFilterCondition("CrmId", QueryComparisons.Equal, entity.CrmId));
 
             var azureEntity = table.ExecuteQuery(query).FirstOrDefault();
             if (azureEntity != null)
@@ -74,14 +78,34 @@ namespace TnOutlookWebApp.Models
             return "Error";
         }
 
-        internal void UpdateAppointmentRecord(AppointmentEntity outlookAppointment, string tasksTableName)
+        internal void UpdateAppointmentRecord(AppointmentEntity newAppointment, string tableName)
         {
-            throw new NotImplementedException();
+            var table = tableClient.GetTableReference(tableName);
+            TableQuery<AppointmentEntity> query = new TableQuery<AppointmentEntity>().Where(TableQuery.GenerateFilterCondition("CrmId", QueryComparisons.Equal, newAppointment.CrmId.ToString()));
+            var azureEntity = table.ExecuteQuery(query).FirstOrDefault();
+            if(azureEntity != null)
+            {
+                if (!string.IsNullOrEmpty(newAppointment.Location))
+                    azureEntity.Location = newAppointment.Location;
+                if (!string.IsNullOrEmpty(newAppointment.Subject))
+                    azureEntity.Subject = newAppointment.Subject;
+                if (!string.IsNullOrEmpty(newAppointment.Body))
+                    azureEntity.Body = newAppointment.Body;
+                if (newAppointment.Start != null)
+                    azureEntity.Start = newAppointment.Start;
+                if (newAppointment.End != null)
+                    azureEntity.End = newAppointment.End;
+            }
+            TableOperation updateOperation = TableOperation.Replace(azureEntity);
+            table.Execute(updateOperation);
         }
 
-        internal Guid GetCrmAppointmentIdByOutlookId(AppointmentEntity outlookAppointment, string tasksTableName)
+        internal string GetCrmAppointmentIdByOutlookId(AppointmentEntity outlookAppointment, string tasksTableName)
         {
-            throw new NotImplementedException();
+            var table = tableClient.GetTableReference(tasksTableName);
+            TableQuery<AppointmentEntity> query = new TableQuery<AppointmentEntity>().Where(TableQuery.GenerateFilterCondition("OutlookId", QueryComparisons.Equal, outlookAppointment.OutlookId));
+            var crmId = table.ExecuteQuery(query).FirstOrDefault().CrmId;
+            return crmId;
         }
 
         internal void UpdateTaskRecord(TaskEntity updateTask, string tableName)
@@ -115,8 +139,8 @@ namespace TnOutlookWebApp.Models
         {
             var table = tableClient.GetTableReference(tableName);
 
-            TableQuery<AzureTaskEntity> query = new TableQuery<AzureTaskEntity>().Where(TableQuery.GenerateFilterCondition("OutlookId", QueryComparisons.Equal, taskEntity.OutlookId.ToString()));
-
+            TableQuery<AzureTaskEntity> query = new TableQuery<AzureTaskEntity>().Where(TableQuery.GenerateFilterCondition("OutlookId", QueryComparisons.Equal, taskEntity.OutlookId));
+            //as appointment
             var azureEntity = table.ExecuteQuery(query).FirstOrDefault();
             if (azureEntity != null)
             {

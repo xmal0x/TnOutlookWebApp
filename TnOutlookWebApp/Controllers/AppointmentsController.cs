@@ -18,7 +18,7 @@ namespace TnOutlookWebApp.Controllers
         string crmPass = ConfigurationManager.AppSettings["organizationServicePass"];
         string azureConnectionString = ConfigurationManager.AppSettings["cloudStorageConnectionString"];
 
-        string tasksTableName = "tasksTable";
+        string azureTableName = "appointmentTable";
 
         [HttpPost]
         public string CreateAppointmentInOutlook(AppointmentEntity appointmentEntity)
@@ -26,7 +26,7 @@ namespace TnOutlookWebApp.Controllers
             if (!InitializeHelpers())
                 return "Initialize helpers fail";
             appointmentEntity.OutlookId = exchangeHelper.CreateNewOutlookAppointment(appointmentEntity);
-            //azureHelper.CreateAppointmentRecord(appointmentEntity, tasksTableName);
+            azureHelper.CreateAppointmentRecord(appointmentEntity, azureTableName);
             return appointmentEntity.OutlookId;
         }
 
@@ -35,8 +35,10 @@ namespace TnOutlookWebApp.Controllers
         {
             if (!InitializeHelpers())
                 return "Initialize helpers fail";
-            //string outlookAppointmentId = azureHelper.
-            return "";
+            appointmentEntity.OutlookId = azureHelper.GetOutlookAppointmentIdByCrmId(appointmentEntity, azureTableName);
+            exchangeHelper.UpdateOutlookAppointment(appointmentEntity);
+            azureHelper.UpdateAppointmentRecord(appointmentEntity, azureTableName);
+            return "Update appointment success";
         }
 
         [HttpPost]
@@ -45,9 +47,9 @@ namespace TnOutlookWebApp.Controllers
             if (!InitializeHelpers())
                 return "Initialize helpers fail";
             AppointmentEntity outlookAppointment = exchangeHelper.GetAppointmentFromOutlook(outlookId);
-            outlookAppointment.CrmId = azureHelper.GetCrmAppointmentIdByOutlookId(outlookAppointment, tasksTableName);
+            outlookAppointment.CrmId = azureHelper.GetCrmAppointmentIdByOutlookId(outlookAppointment, azureTableName);
             string result = crmHelper.UpdateCrmAppointment(outlookAppointment);
-            azureHelper.UpdateAppointmentRecord(outlookAppointment, tasksTableName);
+            azureHelper.UpdateAppointmentRecord(outlookAppointment, azureTableName);
             return "Success update";
         }
         private bool InitializeHelpers()
