@@ -14,7 +14,7 @@ namespace TnOutlookWebApp.Models
         {
             this.userMail = userMail;
             this.password = password;
-            exchangeService = new ExchangeService(ExchangeVersion.Exchange2013_SP1, TimeZoneInfo.Utc);
+            exchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP2, TimeZoneInfo.Utc);
             exchangeService.Credentials = new WebCredentials(this.userMail, this.password);
             exchangeService.TraceEnabled = true;
             exchangeService.AutodiscoverUrl(userMail, RedirectionUrlValidationCallback);
@@ -86,6 +86,7 @@ namespace TnOutlookWebApp.Models
 
         internal TaskEntity GetTaskFromOutlook(string outlookId)
         {
+            //var id = exchangeService.ConvertId(new AlternateId(IdFormat.EwsLegacyId, outlookId, ""), IdFormat.EwsId);
             Task outlookTask = Task.Bind(exchangeService, new ItemId(outlookId));
             
             if (outlookTask == null)

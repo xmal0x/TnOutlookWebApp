@@ -34,7 +34,7 @@ namespace TnOutlookWebApp.Models
 
         public string GetUserMailByGuid(Guid guid)
         {
-            return GetFieldValueFromEntity("systemuser", "regardingobjectid", guid);
+            return GetFieldValueFromEntity("systemuser", "internalemailaddress", guid);
             /*
             string email = string.Empty;
             var user = organizationService.Retrieve("systemuser", guid, new ColumnSet("internalemailaddress"));
