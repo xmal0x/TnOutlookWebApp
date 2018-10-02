@@ -208,10 +208,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AppointmentEntity.cs" />
-    <Compile Include="Models\AzureHelper.cs" />
-    <Compile Include="Models\AzureTaskEntity.cs" />
     <Compile Include="Models\CrmHelper.cs" />
     <Compile Include="Models\ExchangeHelper.cs" />
+    <Compile Include="Models\IntegrationEntity.cs" />
     <Compile Include="Models\TaskEntity.cs" />
     <Compile Include="Models\TaskStatusCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -45,7 +45,7 @@ namespace TnOutlookWebApp.Models
         {
             var table = tableClient.GetTableReference(tableName);
             table.CreateIfNotExists();
-            appointmentEntity.PartitionKey = appointmentEntity.Start.ToString("yyyyMM");
+            //appointmentEntity.PartitionKey = appointmentEntity.Start.ToString("yyyyMM");
             var insertOpperation = TableOperation.Insert(appointmentEntity);
             table.Execute(insertOpperation);
         }
@@ -54,7 +54,7 @@ namespace TnOutlookWebApp.Models
         {
             var table = tableClient.GetTableReference(tableName);
 
-            TableQuery<AppointmentEntity> query = new TableQuery<AppointmentEntity>().Where(TableQuery.GenerateFilterCondition("CrmId", QueryComparisons.Equal, entity.CrmId));
+            TableQuery<AppointmentEntity> query = new TableQuery<AppointmentEntity>().Where(TableQuery.GenerateFilterCondition("CrmId", QueryComparisons.Equal, entity.CrmId.ToString()));
 
             var azureEntity = table.ExecuteQuery(query).FirstOrDefault();
             if (azureEntity != null)
@@ -100,7 +100,7 @@ namespace TnOutlookWebApp.Models
             table.Execute(updateOperation);
         }
 
-        internal string GetCrmAppointmentIdByOutlookId(AppointmentEntity outlookAppointment, string tasksTableName)
+        internal Guid GetCrmAppointmentIdByOutlookId(AppointmentEntity outlookAppointment, string tasksTableName)
         {
             var table = tableClient.GetTableReference(tasksTableName);
             TableQuery<AppointmentEntity> query = new TableQuery<AppointmentEntity>().Where(TableQuery.GenerateFilterCondition("OutlookId", QueryComparisons.Equal, outlookAppointment.OutlookId));

@@ -36,8 +36,8 @@ namespace TnOutlookWebApp.Models
         {
             Appointment appointment = new Appointment(exchangeService)
             {
-                Start = appointmentEntity.Start,
-                End = appointmentEntity.End,
+                Start = (DateTime)appointmentEntity.Start,
+                End = (DateTime)appointmentEntity.End,
                 Subject = appointmentEntity.Subject,
                 Body = new MessageBody(BodyType.Text, appointmentEntity.Body),
                 Location = appointmentEntity.Location,                
@@ -58,9 +58,9 @@ namespace TnOutlookWebApp.Models
             if (!string.IsNullOrEmpty(appointmentEntity.Body))
                 outlookAppointment.Body = appointmentEntity.Body;
             if (appointmentEntity.Start != null)
-                outlookAppointment.Start = appointmentEntity.Start;
+                outlookAppointment.Start = (DateTime)appointmentEntity.Start;
             if (appointmentEntity.End != null)
-                outlookAppointment.End = appointmentEntity.End;
+                outlookAppointment.End = (DateTime)appointmentEntity.End;
             outlookAppointment.Update(ConflictResolutionMode.AlwaysOverwrite);
             return "Appointment update success";
         }
@@ -86,7 +86,6 @@ namespace TnOutlookWebApp.Models
 
         internal TaskEntity GetTaskFromOutlook(string outlookId)
         {
-            //var id = exchangeService.ConvertId(new AlternateId(IdFormat.EwsLegacyId, outlookId, ""), IdFormat.EwsId);
             Task outlookTask = Task.Bind(exchangeService, new ItemId(outlookId));
             
             if (outlookTask == null)

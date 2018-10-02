@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Web.Http;
 using TnOutlookWebApp.Models;
+using Newtonsoft.Json;
 
 namespace TnOutlookWebApp.Controllers
 {
@@ -9,16 +10,12 @@ namespace TnOutlookWebApp.Controllers
     {
         ExchangeHelper exchangeHelper;
         CrmHelper crmHelper;
-        AzureHelper azureHelper;
 
         string userMail = ConfigurationManager.AppSettings["exchangeServiceUsername"];
         string password = ConfigurationManager.AppSettings["exchangeServicePass"];
         string crmUri = ConfigurationManager.AppSettings["organizationServiceUri"];
         string crmUser = ConfigurationManager.AppSettings["organizationServiceUsername"];
         string crmPass = ConfigurationManager.AppSettings["organizationServicePass"];
-        string azureConnectionString = ConfigurationManager.AppSettings["cloudStorageConnectionString"];
-
-        string azureTableName = "appointmentTable";
 
         [HttpPost]
         public string CreateAppointmentInOutlook(AppointmentEntity appointmentEntity)
@@ -26,8 +23,8 @@ namespace TnOutlookWebApp.Controllers
             if (!InitializeHelpers())
                 return "Initialize helpers fail";
             appointmentEntity.OutlookId = exchangeHelper.CreateNewOutlookAppointment(appointmentEntity);
-            azureHelper.CreateAppointmentRecord(appointmentEntity, azureTableName);
-            return appointmentEntity.OutlookId;
+            crmHelper.UpdateCrmAppointment(appointmentEntity);
+            return JsonConvert.SerializeObject(appointmentEntity.OutlookId);
         }
 
         [HttpPost]
@@ -35,9 +32,9 @@ namespace TnOutlookWebApp.Controllers
         {
             if (!InitializeHelpers())
                 return "Initialize helpers fail";
-            appointmentEntity.OutlookId = azureHelper.GetOutlookAppointmentIdByCrmId(appointmentEntity, azureTableName);
+            appointmentEntity.OutlookId = crmHelper.GetOutlookId(appointmentEntity);
             exchangeHelper.UpdateOutlookAppointment(appointmentEntity);
-            azureHelper.UpdateAppointmentRecord(appointmentEntity, azureTableName);
+            crmHelper.UpdateCrmAppointment(appointmentEntity);
             return "Update appointment success";
         }
 
@@ -47,9 +44,7 @@ namespace TnOutlookWebApp.Controllers
             if (!InitializeHelpers())
                 return "Initialize helpers fail";
             AppointmentEntity outlookAppointment = exchangeHelper.GetAppointmentFromOutlook(outlookId);
-            outlookAppointment.CrmId = azureHelper.GetCrmAppointmentIdByOutlookId(outlookAppointment, azureTableName);
             string result = crmHelper.UpdateCrmAppointment(outlookAppointment);
-            azureHelper.UpdateAppointmentRecord(outlookAppointment, azureTableName);
             return "Success update";
         }
         private bool InitializeHelpers()
@@ -58,10 +53,7 @@ namespace TnOutlookWebApp.Controllers
                 exchangeHelper = new ExchangeHelper(userMail, password);
             if (crmHelper == null)
                 crmHelper = new CrmHelper(crmUser, crmPass, crmUri);
-            if (azureHelper == null)
-                azureHelper = new AzureHelper(azureConnectionString);
-
-            if (exchangeHelper != null && crmHelper != null && azureHelper != null)
+            if (exchangeHelper != null && crmHelper != null)
                 return true;
             else
                 return false;

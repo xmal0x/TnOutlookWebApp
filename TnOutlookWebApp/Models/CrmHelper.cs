@@ -35,13 +35,6 @@ namespace TnOutlookWebApp.Models
         public string GetUserMailByGuid(Guid guid)
         {
             return GetFieldValueFromEntity("systemuser", "internalemailaddress", guid);
-            /*
-            string email = string.Empty;
-            var user = organizationService.Retrieve("systemuser", guid, new ColumnSet("internalemailaddress"));
-            if (user != null)
-                email = user["internalemailaddress"].ToString();
-            return email;
-            */
         }
 
         private string GetFieldValueFromEntity(string entityLogicalName, string fieldName, Guid guid)
@@ -53,23 +46,91 @@ namespace TnOutlookWebApp.Models
             return value;
         }
 
-        internal string UpdateCrmAppointment(AppointmentEntity outlookAppointment)
+        internal string UpdateCrmAppointment(AppointmentEntity newAppointment)
         {
-            throw new NotImplementedException();
-        }
-
-        internal string UpdateCrmTask(TaskEntity outlookTask)
-        {
-            var crmTaskId = outlookTask.CrmId;
-            var oldCrmTask = organizationService.Retrieve("task", crmTaskId, new ColumnSet(true));
             try
             {
-                Entity updCrmTask = new Entity("task");
-                updCrmTask.Id = oldCrmTask.Id;
-                updCrmTask["statecode"] = new OptionSetValue((int)outlookTask.TaskStatus);
-                updCrmTask["subject"] = outlookTask.Subject;
-                updCrmTask["description"] = outlookTask.Body;
-                updCrmTask["scheduledend"] = outlookTask.DuoDate;
+                Entity updAppointment = new Entity(newAppointment.CrmEntityLogicalName);
+                updAppointment.Id = newAppointment.CrmId;
+                if (!string.IsNullOrEmpty(newAppointment.Body))
+                {
+                    updAppointment["description"] = newAppointment.Body;
+                }
+                if (newAppointment.End != null)
+                {
+                    updAppointment["scheduledend"] = newAppointment.End;
+                }
+                if (newAppointment.Start != null)
+                {
+                    updAppointment["scheduledstart"] = newAppointment.Start;
+                }
+                if (!string.IsNullOrEmpty(newAppointment.Location))
+                {
+                    updAppointment["location"] = newAppointment.Location;
+                }
+                if (!string.IsNullOrEmpty(newAppointment.OutlookId))
+                {
+                    updAppointment["ylv_outlookid"] = newAppointment.OutlookId;
+                }
+                if (!string.IsNullOrEmpty(newAppointment.Subject))
+                {
+                    updAppointment["subject"] = newAppointment.Subject;
+                }
+                organizationService.Update(updAppointment);
+                return "Appointment update success";
+            }
+            catch (Exception ex)
+            {
+                return "Appointment update fail\n" + ex.Message;
+            }
+        }
+
+        internal Guid GetCrmIdByOutlookId(IntegrationEntity entity)
+        {
+            string fetch = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>" + 
+                              "<entity name='" + entity.CrmEntityLogicalName + "'>" +
+                                "<order attribute='subject' descending='false' />" + 
+                                "<filter type='and'>" + 
+                                  "<condition attribute='ylv_outlookid' operator='eq' value='" + entity.OutlookId + "' />" + 
+                                "</filter>" +
+                              "</entity>" +
+                            "</fetch>";
+            var crmEntity = organizationService.RetrieveMultiple(new FetchExpression(fetch)).Entities.FirstOrDefault();
+            return crmEntity == null ? Guid.Empty : crmEntity.Id;
+        }
+
+        internal string GetOutlookId(IntegrationEntity entity)
+        {
+            var crmEntity = organizationService.Retrieve(entity.CrmEntityLogicalName, entity.CrmId, new ColumnSet("ylv_outlookid"));
+            return crmEntity["ylv_outlookid"] == null ? null : crmEntity["ylv_outlookid"].ToString();
+        }
+
+        internal string UpdateCrmTask(TaskEntity newTask)
+        {
+            try
+            {
+                Entity updCrmTask = new Entity(newTask.CrmEntityLogicalName);
+                updCrmTask.Id = newTask.CrmId;
+                if(newTask.TaskStatus != null)
+                {
+                    updCrmTask["statecode"] = new OptionSetValue((int)newTask.TaskStatus);
+                }
+                if (!string.IsNullOrEmpty(newTask.Subject))
+                {
+                    updCrmTask["subject"] = newTask.Subject;
+                }
+                if (!string.IsNullOrEmpty(newTask.Subject))
+                {
+                    updCrmTask["description"] = newTask.Body;
+                }
+                if(newTask.DuoDate != null)
+                {
+                    updCrmTask["scheduledend"] = newTask.DuoDate;
+                }
+                if (!string.IsNullOrEmpty(newTask.OutlookId))
+                {
+                    updCrmTask["ylv_outlookid"] = newTask.OutlookId;
+                }
                 organizationService.Update(updCrmTask);
                 return "Success update";
             }
