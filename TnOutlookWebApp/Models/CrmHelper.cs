@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.ServiceModel.Description;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace TnOutlookWebApp.Models
@@ -107,6 +108,11 @@ namespace TnOutlookWebApp.Models
 
         internal string UpdateCrmTask(TaskEntity newTask)
         {
+            bool needUpdate = false;
+            QueryExpression queryExp = new QueryExpression("task");
+            queryExp.ColumnSet = new ColumnSet(true);
+                       
+
             try
             {
                 Entity updCrmTask = new Entity(newTask.CrmEntityLogicalName);
@@ -114,24 +120,40 @@ namespace TnOutlookWebApp.Models
                 if(newTask.TaskStatus != null)
                 {
                     updCrmTask["statecode"] = new OptionSetValue((int)newTask.TaskStatus);
+                    needUpdate = true;
+                    queryExp.Criteria.AddCondition("statecode", ConditionOperator.Equal, (int)newTask.TaskStatus);
                 }
                 if (!string.IsNullOrEmpty(newTask.Subject))
                 {
                     updCrmTask["subject"] = newTask.Subject;
+                    needUpdate = true;
+                    queryExp.Criteria.AddCondition("subject", ConditionOperator.Equal, newTask.Subject);
                 }
-                if (!string.IsNullOrEmpty(newTask.Subject))
-                {
-                    updCrmTask["description"] = newTask.Body;
+                if (!string.IsNullOrEmpty(newTask.Body))
+                {                    
+                    updCrmTask["description"] = GetStringWithoutTags(newTask.Body);
+                    needUpdate = true;
+                    queryExp.Criteria.AddCondition("description", ConditionOperator.Equal, GetStringWithoutTags(newTask.Body));
                 }
-                if(newTask.DuoDate != null)
+                if (newTask.DuoDate != null )
                 {
                     updCrmTask["scheduledend"] = newTask.DuoDate;
+                    needUpdate = true;
+                    queryExp.Criteria.AddCondition("scheduledend", ConditionOperator.On, newTask.DuoDate.Value.ToString("yyyy-MM-dd"));
                 }
                 if (!string.IsNullOrEmpty(newTask.OutlookId))
                 {
                     updCrmTask["ylv_outlookid"] = newTask.OutlookId;
+                    needUpdate = true;
+                    queryExp.Criteria.AddCondition("ylv_outlookid", ConditionOperator.Equal, newTask.OutlookId);
                 }
-                organizationService.Update(updCrmTask);
+
+                var oldTask = organizationService.RetrieveMultiple(queryExp).Entities.FirstOrDefault();
+                if (oldTask != null)
+                    return "Update not required";
+
+                if (needUpdate)
+                    organizationService.Update(updCrmTask);
                 return "Success update";
             }
             catch (Exception ex)
@@ -139,6 +161,12 @@ namespace TnOutlookWebApp.Models
                 return "Update fail\n" + ex.Message;
             }
 
+        }
+
+        private object GetStringWithoutTags(string body)
+        {
+            string bodyWithoutTags = Regex.Replace(body, "<[^>]*>", "\n");
+            return bodyWithoutTags.Trim();
         }
     }
 }

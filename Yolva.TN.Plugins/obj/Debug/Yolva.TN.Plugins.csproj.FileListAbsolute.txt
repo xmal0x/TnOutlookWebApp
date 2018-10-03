@@ -1,8 +1,4 @@
-C:\Users\kira_galkin\source\repos\TNExchange\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.csproj.CoreCompileInputs.cache
-C:\Users\kira_galkin\source\repos\TNExchange\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.dll
-C:\Users\kira_galkin\source\repos\TNExchange\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.pdb
-C:\Users\kira_galkin\source\repos\TNExchange\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.csprojAssemblyReference.cache
-Y:\workStuff\myProjects\TnExchangePlugins\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.csprojAssemblyReference.cache
-Y:\workStuff\myProjects\TnExchangePlugins\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.csproj.CoreCompileInputs.cache
-Y:\workStuff\myProjects\TnExchangePlugins\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.dll
-Y:\workStuff\myProjects\TnExchangePlugins\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.pdb
+Y:\workStuff\myProjects\TnOutlookWebApp\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.csprojAssemblyReference.cache
+Y:\workStuff\myProjects\TnOutlookWebApp\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.csproj.CoreCompileInputs.cache
+Y:\workStuff\myProjects\TnOutlookWebApp\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.dll
+Y:\workStuff\myProjects\TnOutlookWebApp\Yolva.TN.Plugins\obj\Debug\Yolva.TN.Plugins.pdb

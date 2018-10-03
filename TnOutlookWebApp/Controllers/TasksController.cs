@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Web.Http;
 using TnOutlookWebApp.Models;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace TnOutlookWebApp.Controllers
 {
@@ -20,6 +21,7 @@ namespace TnOutlookWebApp.Controllers
         [HttpPost]
         public string CreateTaskInOutlook(TaskEntity taskEntity)
         {
+            Trace.TraceInformation("Create task in outlook");
             if (!InitializeHelpers())
                 return "Initialize helpers fail";
             string newOwnerMail = crmHelper.GetUserMailByGuid(taskEntity.NewTaskOwnerId);
@@ -31,9 +33,11 @@ namespace TnOutlookWebApp.Controllers
         [HttpPost]
         public string UpdateTaskInOutlook(TaskEntity taskEntity)
         {
+            Trace.TraceInformation("Update task in outlook");
+
             if (!InitializeHelpers())
                 return "Initialize helpers fail";
-            string outlookTaskId = crmHelper.GetOutlookId(taskEntity);
+            string outlookTaskId = crmHelper.GetOutlookId(taskEntity);            
             if (taskEntity.NewTaskOwnerId == Guid.Empty)
             {
                 taskEntity.OutlookId = outlookTaskId;
@@ -53,17 +57,24 @@ namespace TnOutlookWebApp.Controllers
         }
 
         [HttpPost]
-        public string UpdateTaskInCrm(string outlookId)
+        public string UpdateTaskInCrm(Outlook outlook)
         {
             if (!InitializeHelpers())
-                return "Error";
-            TaskEntity outlookTask = exchangeHelper.GetTaskFromOutlook(outlookId);
-            //outlookTask.CrmId = azureHelper.GetCrmTaskIdByOutlookId(outlookTask, tasksTableName);
+                return "Initialize helpers fail";
+            TaskEntity outlookTask = exchangeHelper.GetTaskFromOutlook(outlook.outlookId);
             outlookTask.CrmId = crmHelper.GetCrmIdByOutlookId(outlookTask);
             string result = crmHelper.UpdateCrmTask(outlookTask);
             return result;
         }
 
+        [HttpPost]
+        public string DeleteTaskInOutlook(TaskEntity task)
+        {
+            if (!InitializeHelpers())
+                return "Initialize helpers fail";
+            var res = exchangeHelper.DeleteOutlookTaskById(task.OutlookId);
+            return JsonConvert.SerializeObject(new { result = res });
+        }
 
         private bool InitializeHelpers()
         {

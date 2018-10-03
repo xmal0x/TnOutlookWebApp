@@ -45,7 +45,7 @@ namespace TnOutlookWebApp.Controllers
                 return "Initialize helpers fail";
             AppointmentEntity outlookAppointment = exchangeHelper.GetAppointmentFromOutlook(outlookId);
             string result = crmHelper.UpdateCrmAppointment(outlookAppointment);
-            return "Success update";
+            return result;
         }
         private bool InitializeHelpers()
         {

@@ -7,8 +7,9 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using TnOutlookWebApp.Models;
 using Yolva.TN.Plugins.BaseClasses;
-using Yolva.TN.Plugins.Common;
+
 
 namespace Yolva.TN.Plugins.Task
 {

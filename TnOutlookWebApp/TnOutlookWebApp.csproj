@@ -203,7 +203,6 @@
     <Compile Include="Controllers\AppointmentsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TasksController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -211,6 +210,7 @@
     <Compile Include="Models\CrmHelper.cs" />
     <Compile Include="Models\ExchangeHelper.cs" />
     <Compile Include="Models\IntegrationEntity.cs" />
+    <Compile Include="Models\Outlook.cs" />
     <Compile Include="Models\TaskEntity.cs" />
     <Compile Include="Models\TaskStatusCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

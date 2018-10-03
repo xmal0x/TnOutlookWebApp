@@ -1,5 +1,6 @@
 ﻿using Microsoft.Exchange.WebServices.Data;
 using System;
+using System.Text;
 using System.Web.Helpers;
 using System.Web.Mvc;
 
@@ -42,6 +43,7 @@ namespace TnOutlookWebApp.Models
                 Body = new MessageBody(BodyType.Text, appointmentEntity.Body),
                 Location = appointmentEntity.Location,                
             };
+
             foreach (var attendees in appointmentEntity.RequiredAttendeesEmails)
                 appointment.RequiredAttendees.Add(attendees);
             appointment.Save(SendInvitationsMode.SendToAllAndSaveCopy);            
@@ -67,21 +69,42 @@ namespace TnOutlookWebApp.Models
 
         internal string UpdateOutlookTask(TaskEntity taskEntity, string outlookTaskId)
         {
+            bool needUpdate = false;
             Task outlookTask = Task.Bind(exchangeService, new ItemId(outlookTaskId));
             if (!string.IsNullOrEmpty(taskEntity.Subject))
+            {
                 outlookTask.Subject = taskEntity.Subject;
+                needUpdate = true;
+            }
             if (!string.IsNullOrEmpty(taskEntity.Body))
+            {
                 outlookTask.Body = taskEntity.Body;
-            if (taskEntity.DuoDate != null)
+                needUpdate = true;
+            }
+            if (taskEntity.DuoDate != null )
+            {
                 outlookTask.DueDate = taskEntity.DuoDate;
-            outlookTask.Update(ConflictResolutionMode.AlwaysOverwrite);
+                needUpdate = true;
+            }
+            if(needUpdate)
+                outlookTask.Update(ConflictResolutionMode.AlwaysOverwrite);
             return "Update success";
+            
         }
 
-        internal void DeleteOutlookTaskById(string oldOutlookIdForDelete)
+        internal string DeleteOutlookTaskById(string oldOutlookIdForDelete)
         {
-            Task task = Task.Bind(exchangeService, new ItemId(oldOutlookIdForDelete));
-            task.Delete(DeleteMode.SoftDelete);
+            try
+            {
+                Task task = Task.Bind(exchangeService, new ItemId(oldOutlookIdForDelete));
+                task.Delete(DeleteMode.SoftDelete);
+                return "Delete success";
+            }
+            catch (Exception ex)
+            {
+                return "Delete fail" + Environment.NewLine + ex.Message;  
+            }
+
         }
 
         internal TaskEntity GetTaskFromOutlook(string outlookId)
@@ -124,7 +147,19 @@ namespace TnOutlookWebApp.Models
 
         internal AppointmentEntity GetAppointmentFromOutlook(string outlookId)
         {
-            throw new NotImplementedException();
+            Appointment outlookAppointment = Appointment.Bind(exchangeService, outlookId);
+            if (outlookAppointment == null)
+                return null;
+            AppointmentEntity appointmentEntity = new AppointmentEntity()
+            {
+                OutlookId = outlookId,
+                Body = outlookAppointment.Body.Text,
+                End = outlookAppointment.End,
+                Location = outlookAppointment.Location,
+                Start = outlookAppointment.Start,
+                Subject = outlookAppointment.Subject               
+            };
+            return appointmentEntity;
         }
 
         private bool RedirectionUrlValidationCallback(String redirectionUrl)

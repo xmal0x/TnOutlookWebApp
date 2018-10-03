@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28010.2019
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TnOutlookWebApp", "TnOutlookWebApp\TnOutlookWebApp.csproj", "{AE777EFD-142C-4A0B-8229-D3FAF2EF3239}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yolva.TN.Plugins", "..\TnExchangePlugins\Yolva.TN.Plugins\Yolva.TN.Plugins.csproj", "{48731F87-8068-47DC-9796-62DD83643743}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yolva.TN.Plugins", "Yolva.TN.Plugins\Yolva.TN.Plugins.csproj", "{64EC7EA3-5DC0-41DE-A32F-54E9ECBBA7F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{AE777EFD-142C-4A0B-8229-D3FAF2EF3239}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE777EFD-142C-4A0B-8229-D3FAF2EF3239}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE777EFD-142C-4A0B-8229-D3FAF2EF3239}.Release|Any CPU.Build.0 = Release|Any CPU
-		{48731F87-8068-47DC-9796-62DD83643743}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{48731F87-8068-47DC-9796-62DD83643743}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{48731F87-8068-47DC-9796-62DD83643743}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{48731F87-8068-47DC-9796-62DD83643743}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64EC7EA3-5DC0-41DE-A32F-54E9ECBBA7F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64EC7EA3-5DC0-41DE-A32F-54E9ECBBA7F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64EC7EA3-5DC0-41DE-A32F-54E9ECBBA7F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64EC7EA3-5DC0-41DE-A32F-54E9ECBBA7F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

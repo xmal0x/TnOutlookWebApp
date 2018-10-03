@@ -47,13 +47,16 @@ Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\obj\Release\TnOutlookWeb
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\obj\Release\TnOutlookWebApp.csprojAssemblyReference.cache
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\Antlr3.Runtime.pdb
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\Microsoft.AI.DependencyCollector.xml
+Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\Microsoft.AI.PerfCounterCollector.xml
+Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\Microsoft.AI.ServerTelemetryChannel.xml
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\Microsoft.AI.Web.xml
+Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\Microsoft.AI.WindowsServer.xml
+Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\Microsoft.ApplicationInsights.xml
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\Microsoft.AspNet.TelemetryCorrelation.xml
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
-Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\Microsoft.AI.WindowsServer.xml
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\Newtonsoft.Json.xml
+Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\System.Diagnostics.DiagnosticSource.xml
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\System.Net.Http.Formatting.xml
-Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\ru\System.Net.Http.Formatting.resources.dll
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\System.Web.Helpers.xml
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\System.Web.Http.xml
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\System.Web.Http.WebHost.xml
@@ -63,6 +66,7 @@ Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\System.Web.WebPages.
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\System.Web.WebPages.Deployment.xml
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\System.Web.WebPages.Razor.xml
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\System.Web.Optimization.xml
+Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\ru\System.Net.Http.Formatting.resources.dll
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\ru\System.Web.Helpers.resources.dll
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\ru\System.Web.Http.resources.dll
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\ru\System.Web.Http.WebHost.resources.dll
@@ -72,4 +76,3 @@ Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\ru\System.Web.WebPag
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\ru\System.Web.WebPages.Deployment.resources.dll
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\ru\System.Web.WebPages.Razor.resources.dll
 Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\ru\System.Web.Optimization.resources.dll
-Y:\workStuff\myProjects\TnOutlookWebApp\TnOutlookWebApp\bin\System.Diagnostics.DiagnosticSource.xml

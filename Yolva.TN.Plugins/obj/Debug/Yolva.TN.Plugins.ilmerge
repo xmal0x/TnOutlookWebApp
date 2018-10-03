@@ -1,2 +1,14 @@
 Yolva.TN.Plugins.dll
+TnOutlookWebApp.dll
+System.Web.Optimization.dll
+System.Web.Mvc.dll
+System.Web.Http.dll
+Microsoft.Exchange.WebServices.dll
+System.Net.Http.Formatting.dll
+System.Web.Http.WebHost.dll
+Microsoft.Web.Infrastructure.dll
+System.Web.WebPages.dll
+System.Web.WebPages.Razor.dll
+System.Web.Razor.dll
+System.Web.WebPages.Deployment.dll
 Newtonsoft.Json.dll
