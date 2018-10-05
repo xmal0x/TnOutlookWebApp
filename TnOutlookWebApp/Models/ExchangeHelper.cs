@@ -1,5 +1,6 @@
 ﻿using Microsoft.Exchange.WebServices.Data;
 using System;
+using System.Diagnostics;
 using System.Text;
 using System.Web.Helpers;
 using System.Web.Mvc;
@@ -69,6 +70,7 @@ namespace TnOutlookWebApp.Models
 
         internal string UpdateOutlookTask(TaskEntity taskEntity, string outlookTaskId)
         {
+            Trace.TraceInformation("UpdateOutlokTask");
             bool needUpdate = false;
             Task outlookTask = Task.Bind(exchangeService, new ItemId(outlookTaskId));
             if (!string.IsNullOrEmpty(taskEntity.Subject))

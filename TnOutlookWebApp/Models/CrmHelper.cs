@@ -3,6 +3,7 @@ using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.ServiceModel.Description;
@@ -108,6 +109,7 @@ namespace TnOutlookWebApp.Models
 
         internal string UpdateCrmTask(TaskEntity newTask)
         {
+            Trace.TraceInformation("UpdateCrmTask");
             bool needUpdate = false;
             QueryExpression queryExp = new QueryExpression("task");
             queryExp.ColumnSet = new ColumnSet(true);
