@@ -87,17 +87,153 @@ namespace TnOutlookWebApp.Models
             }
         }
 
+        internal bool IsTaskNeedUpdate(TaskEntity outlookTask)
+        {
+            QueryExpression queryExpression = new QueryExpression()
+            {
+                EntityName = outlookTask.CrmEntityLogicalName,
+                Criteria =
+                {
+                    FilterOperator = LogicalOperator.And,
+                    Conditions =
+                    {
+                        new ConditionExpression("subject", ConditionOperator.Equal, outlookTask.Subject),
+                        new ConditionExpression("scheduledend", ConditionOperator.On, outlookTask.DuoDate),
+                        new ConditionExpression("description", ConditionOperator.Equal, GetStringWithoutTags(outlookTask.Body)),
+                        new ConditionExpression("ylv_outlookid", ConditionOperator.Equal, outlookTask.OutlookId),
+                        new ConditionExpression("statecode", ConditionOperator.Equal, (int)outlookTask.TaskStatus)
+                    }
+                }
+            };
+
+            var task = organizationService.RetrieveMultiple(queryExpression).Entities.FirstOrDefault();
+            return task == null ? true : false;
+            
+        }
+
+        internal void UpdateResponsesInCrm(AppointmentEntity appointmentEntity, List<AttendeesResponse> outlookResponses)
+        {
+            ConditionExpression condition = new ConditionExpression();
+            condition.AttributeName = "ylv_responses";
+            condition.Operator = ConditionOperator.Equal;
+            condition.Values.Add(appointmentEntity.CrmId.ToString());
+            ColumnSet columns = new ColumnSet("ylv_contact", "ylv_responsetype");
+            QueryExpression query1 = new QueryExpression();
+            query1.ColumnSet = columns;
+            query1.EntityName = "ylv_response";
+            query1.Criteria.AddCondition(condition);
+
+            EntityCollection associatedResponses = organizationService.RetrieveMultiple(query1);
+            foreach(var response in associatedResponses.Entities)
+            {
+                if(response["ylv_contact"] != null)
+                {
+                    var contactResponseEntityRef = (EntityReference)response["ylv_contact"];
+                    var contactResponseEntity = organizationService.Retrieve(contactResponseEntityRef.LogicalName, contactResponseEntityRef.Id, new ColumnSet("emailaddress1"));
+                    foreach(var outlookResp in outlookResponses)
+                    {
+                        if(contactResponseEntity["emailaddress1"].ToString().ToUpper() == outlookResp.Email.ToUpper())
+                        {
+                            switch (outlookResp.Response)
+                            {
+                                case ResponseType.Accept:
+                                    response["ylv_responsetype"] = new OptionSetValue((int)ResponseType.Accept);
+
+                                    break;
+                                case ResponseType.Discard:
+                                    response["ylv_responsetype"] = new OptionSetValue((int)ResponseType.Discard);
+                                    break;
+                                case ResponseType.Unknown:
+                                    response["ylv_responsetype"] = new OptionSetValue((int)ResponseType.Unknown);
+                                    break;
+                                default:
+                                    response["ylv_responsetype"] = new OptionSetValue((int)ResponseType.Unknown);
+                                    break;
+                            }
+                            organizationService.Update(response);
+                        }
+                    }
+                    
+                }
+              
+
+            }
+
+
+        }
+
+        internal Guid CreateCrmAppointment(AppointmentEntity outlookAppointment)
+        {
+            Entity crmAppointment = new Entity(outlookAppointment.CrmEntityLogicalName);
+            crmAppointment["description"] = GetStringWithoutTags(outlookAppointment.Body);
+            crmAppointment["scheduledend"] = outlookAppointment.End;
+            crmAppointment["location"] = outlookAppointment.Location;
+            crmAppointment["ylv_outlookid"] = outlookAppointment.OutlookId;
+            crmAppointment["scheduledstart"] = outlookAppointment.Start;
+            crmAppointment["subject"] = outlookAppointment.Subject;
+
+            var crmAttendeesPartyCol = new EntityCollection();
+
+            foreach (var email in outlookAppointment.RequiredAttendeesEmails)
+            {
+                var attendeesCrmEntity = GetCrmAttendeesByEmail(email);
+                if(attendeesCrmEntity != null)
+                {
+                    var crmAttendeesList = new Entity("activityparty");
+                    crmAttendeesList["partyid"] = new EntityReference(attendeesCrmEntity.LogicalName, attendeesCrmEntity.Id);
+                    crmAttendeesPartyCol.Entities.Add(crmAttendeesList);                    
+                }
+            }
+            
+            crmAppointment["requiredattendees"] = crmAttendeesPartyCol;
+            crmAppointment.Id = organizationService.Create(crmAppointment);
+
+            foreach (var att in crmAttendeesPartyCol.Entities)
+            {
+                var response = new Entity("ylv_response");
+                response["ylv_name"] = crmAppointment["subject"].ToString();
+                response["ylv_contact"] = (EntityReference)att["partyid"];
+                response["ylv_responsetype"] = new OptionSetValue((int)ResponseType.Unknown);
+                response["ylv_responses"] = crmAppointment.ToEntityReference();
+                response.Id = organizationService.Create(response);
+            }
+
+            return crmAppointment.Id;
+
+        }
+
+        private Entity GetCrmAttendeesByEmail(string email)
+        {
+            QueryExpression queryExpressionContact = new QueryExpression("contact");
+            queryExpressionContact.Criteria.AddCondition("emailaddress1", ConditionOperator.Equal, email);
+            queryExpressionContact.ColumnSet = new ColumnSet("emailaddress1");
+            var contact = organizationService.RetrieveMultiple(queryExpressionContact).Entities.FirstOrDefault();
+            if (contact != null)
+                return contact;
+            QueryExpression queryExpressionSysUser = new QueryExpression("systemuser");
+            queryExpressionSysUser.Criteria.AddCondition("internalemailaddress", ConditionOperator.Equal, email);
+            queryExpressionSysUser.ColumnSet = new ColumnSet("internalemailaddress");
+            var sysUser = organizationService.RetrieveMultiple(queryExpressionSysUser).Entities.FirstOrDefault();
+            //if (sysUser != null)
+                return sysUser;
+
+        }
+
         internal Guid GetCrmIdByOutlookId(IntegrationEntity entity)
         {
-            string fetch = @"<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>" + 
-                              "<entity name='" + entity.CrmEntityLogicalName + "'>" +
-                                "<order attribute='subject' descending='false' />" + 
-                                "<filter type='and'>" + 
-                                  "<condition attribute='ylv_outlookid' operator='eq' value='" + entity.OutlookId + "' />" + 
-                                "</filter>" +
-                              "</entity>" +
-                            "</fetch>";
-            var crmEntity = organizationService.RetrieveMultiple(new FetchExpression(fetch)).Entities.FirstOrDefault();
+            QueryExpression queryExpression = new QueryExpression()
+            {
+                EntityName = entity.CrmEntityLogicalName,
+                Criteria =
+                {
+                    FilterOperator = LogicalOperator.And,
+                    Conditions =
+                    {
+                        new ConditionExpression("ylv_outlookid", ConditionOperator.Equal, entity.OutlookId)
+                    }
+                }
+            };
+            var crmEntity = organizationService.RetrieveMultiple(queryExpression).Entities.FirstOrDefault();
             return crmEntity == null ? Guid.Empty : crmEntity.Id;
         }
 
@@ -109,11 +245,7 @@ namespace TnOutlookWebApp.Models
 
         internal string UpdateCrmTask(TaskEntity newTask)
         {
-            Trace.TraceInformation("UpdateCrmTask");
-            bool needUpdate = false;
-            QueryExpression queryExp = new QueryExpression("task");
-            queryExp.ColumnSet = new ColumnSet(true);
-                       
+            Trace.TraceInformation("UpdateCrmTask");                     
 
             try
             {
@@ -122,40 +254,25 @@ namespace TnOutlookWebApp.Models
                 if(newTask.TaskStatus != null)
                 {
                     updCrmTask["statecode"] = new OptionSetValue((int)newTask.TaskStatus);
-                    needUpdate = true;
-                    queryExp.Criteria.AddCondition("statecode", ConditionOperator.Equal, (int)newTask.TaskStatus);
                 }
                 if (!string.IsNullOrEmpty(newTask.Subject))
                 {
                     updCrmTask["subject"] = newTask.Subject;
-                    needUpdate = true;
-                    queryExp.Criteria.AddCondition("subject", ConditionOperator.Equal, newTask.Subject);
                 }
                 if (!string.IsNullOrEmpty(newTask.Body))
                 {                    
                     updCrmTask["description"] = GetStringWithoutTags(newTask.Body);
-                    needUpdate = true;
-                    queryExp.Criteria.AddCondition("description", ConditionOperator.Equal, GetStringWithoutTags(newTask.Body));
                 }
                 if (newTask.DuoDate != null )
                 {
                     updCrmTask["scheduledend"] = newTask.DuoDate;
-                    needUpdate = true;
-                    queryExp.Criteria.AddCondition("scheduledend", ConditionOperator.On, newTask.DuoDate.Value.ToString("yyyy-MM-dd"));
                 }
                 if (!string.IsNullOrEmpty(newTask.OutlookId))
                 {
                     updCrmTask["ylv_outlookid"] = newTask.OutlookId;
-                    needUpdate = true;
-                    queryExp.Criteria.AddCondition("ylv_outlookid", ConditionOperator.Equal, newTask.OutlookId);
                 }
 
-                var oldTask = organizationService.RetrieveMultiple(queryExp).Entities.FirstOrDefault();
-                if (oldTask != null)
-                    return "Update not required";
-
-                if (needUpdate)
-                    organizationService.Update(updCrmTask);
+                organizationService.Update(updCrmTask);
                 return "Success update";
             }
             catch (Exception ex)
@@ -164,6 +281,8 @@ namespace TnOutlookWebApp.Models
             }
 
         }
+
+
 
         private object GetStringWithoutTags(string body)
         {
