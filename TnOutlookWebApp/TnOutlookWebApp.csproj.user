@@ -9,7 +9,7 @@
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
     <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
-    <NameOfLastUsedPublishProfile>AzureTaskAppWeb - Web Deploy</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>AzureTaskWebApp - Web Deploy</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Exchange.WebServices.Data;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Web.Helpers;
@@ -28,7 +29,7 @@ namespace TnOutlookWebApp.Models
             {
                 Subject = taskEntity.Subject,
                 Body = taskEntity.Body,
-                DueDate = taskEntity.DuoDate                
+                DueDate = taskEntity.DuoDate == null ? DateTime.Now.AddDays(1) : taskEntity.DuoDate                 
             };
             outlookTask.Save(new FolderId(WellKnownFolderName.Tasks, ownerUserMail));
             return outlookTask.Id.UniqueId;
@@ -56,40 +57,71 @@ namespace TnOutlookWebApp.Models
             Appointment outlookAppointment = Appointment.Bind(exchangeService, appointmentEntity.OutlookId);
             if (!string.IsNullOrEmpty(appointmentEntity.Location))
                 outlookAppointment.Location = appointmentEntity.Location;
-            if (!string.IsNullOrEmpty(appointmentEntity.Subject))
-                outlookAppointment.Subject = appointmentEntity.Subject;
             if (!string.IsNullOrEmpty(appointmentEntity.Body))
                 outlookAppointment.Body = appointmentEntity.Body;
             if (appointmentEntity.Start != null)
                 outlookAppointment.Start = (DateTime)appointmentEntity.Start;
             if (appointmentEntity.End != null)
                 outlookAppointment.End = (DateTime)appointmentEntity.End;
-            outlookAppointment.Update(ConflictResolutionMode.AlwaysOverwrite);
+            outlookAppointment.Update(ConflictResolutionMode.AutoResolve);
             return "Appointment update success";
         }
 
-        internal string UpdateOutlookTask(TaskEntity taskEntity, string outlookTaskId)
+        internal List<AttendeesResponse> GetResponseStatus(string outlookId)
+        {
+            List<AttendeesResponse> responses = new List<AttendeesResponse>();
+            Appointment appointment = Appointment.Bind(exchangeService, new ItemId(outlookId));
+            if(appointment != null)
+            {
+                for (int i = 0; i < appointment.RequiredAttendees.Count; i++)
+                {
+                    ResponseType responseType = ResponseType.Unknown;
+                    switch (appointment.RequiredAttendees[i].ResponseType.Value)
+                    {
+                        case MeetingResponseType.Accept:
+                            responseType = ResponseType.Accept;
+                            break;
+                        case MeetingResponseType.Decline:
+                            responseType = ResponseType.Discard;
+                            break;
+                        default:
+                            responseType = ResponseType.Unknown;
+                            break;
+                    }
+
+                    responses.Add(new AttendeesResponse
+                    {
+                        Email = appointment.RequiredAttendees[i].Address,
+                        Response = responseType
+                    });
+                }
+            }
+            return responses;
+        }
+
+        internal string UpdateOutlookTask(TaskEntity taskEntity)
         {
             Trace.TraceInformation("UpdateOutlokTask");
-            bool needUpdate = false;
-            Task outlookTask = Task.Bind(exchangeService, new ItemId(outlookTaskId));
+
+            Task outlookTask = Task.Bind(exchangeService, new ItemId(taskEntity.OutlookId));
+
             if (!string.IsNullOrEmpty(taskEntity.Subject))
             {
                 outlookTask.Subject = taskEntity.Subject;
-                needUpdate = true;
+
             }
             if (!string.IsNullOrEmpty(taskEntity.Body))
             {
                 outlookTask.Body = taskEntity.Body;
-                needUpdate = true;
+
             }
             if (taskEntity.DuoDate != null )
             {
                 outlookTask.DueDate = taskEntity.DuoDate;
-                needUpdate = true;
+
             }
-            if(needUpdate)
-                outlookTask.Update(ConflictResolutionMode.AlwaysOverwrite);
+
+            outlookTask.Update(ConflictResolutionMode.NeverOverwrite);
             return "Update success";
             
         }
@@ -150,6 +182,7 @@ namespace TnOutlookWebApp.Models
         internal AppointmentEntity GetAppointmentFromOutlook(string outlookId)
         {
             Appointment outlookAppointment = Appointment.Bind(exchangeService, outlookId);
+            
             if (outlookAppointment == null)
                 return null;
             AppointmentEntity appointmentEntity = new AppointmentEntity()
@@ -159,8 +192,11 @@ namespace TnOutlookWebApp.Models
                 End = outlookAppointment.End,
                 Location = outlookAppointment.Location,
                 Start = outlookAppointment.Start,
-                Subject = outlookAppointment.Subject               
+                Subject = outlookAppointment.Subject                    
             };
+            appointmentEntity.RequiredAttendeesEmails = new List<string>();
+            foreach (var att in outlookAppointment.RequiredAttendees)
+                appointmentEntity.RequiredAttendeesEmails.Add(att.Address);
             return appointmentEntity;
         }
 
@@ -175,6 +211,12 @@ namespace TnOutlookWebApp.Models
             }
             return result;
 
+        }
+
+        public bool IsAppointmentExistInOutlook(string outlookId)
+        {
+            Appointment appointment = Appointment.Bind(exchangeService, new ItemId(outlookId));
+            return appointment != null;
         }
 
 

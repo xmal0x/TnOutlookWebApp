@@ -41,8 +41,9 @@ namespace TnOutlookWebApp.Controllers
             if (taskEntity.NewTaskOwnerId == Guid.Empty)
             {
                 taskEntity.OutlookId = outlookTaskId;
-                exchangeHelper.UpdateOutlookTask(taskEntity, outlookTaskId);
-                crmHelper.UpdateCrmTask(taskEntity);
+                exchangeHelper.UpdateOutlookTask(taskEntity);
+                //if(crmHelper.IsTaskNeedUpdate(taskEntity))
+                    //crmHelper.UpdateCrmTask(taskEntity);
             }
             else
             {
@@ -50,7 +51,8 @@ namespace TnOutlookWebApp.Controllers
                 string newOutlookTaskId = exchangeHelper.CreateNewOutlookTask(taskEntity, newOwnerMail);
                 string oldOutlookIdForDelete = outlookTaskId;
                 taskEntity.OutlookId = newOutlookTaskId;
-                crmHelper.UpdateCrmTask(taskEntity);
+                //if(crmHelper.IsTaskNeedUpdate(taskEntity))
+                    //crmHelper.UpdateCrmTask(taskEntity);
                 exchangeHelper.DeleteOutlookTaskById(oldOutlookIdForDelete);
             }
             return "Update success";
@@ -63,7 +65,10 @@ namespace TnOutlookWebApp.Controllers
                 return "Initialize helpers fail";
             TaskEntity outlookTask = exchangeHelper.GetTaskFromOutlook(outlook.outlookId);
             outlookTask.CrmId = crmHelper.GetCrmIdByOutlookId(outlookTask);
-            string result = crmHelper.UpdateCrmTask(outlookTask);
+            var isTaskNeedupdate = crmHelper.IsTaskNeedUpdate(outlookTask);
+            string result = string.Empty;
+            if(isTaskNeedupdate)
+                result = crmHelper.UpdateCrmTask(outlookTask);
             return result;
         }
 
@@ -74,6 +79,15 @@ namespace TnOutlookWebApp.Controllers
                 return "Initialize helpers fail";
             var res = exchangeHelper.DeleteOutlookTaskById(task.OutlookId);
             return JsonConvert.SerializeObject(new { result = res });
+        }
+
+        [HttpPost]
+        public string IsCrmTaskExist(Outlook outlook)
+        {
+            if (!InitializeHelpers())
+                return "Initialize helpers fail";
+            var appExist = new ExistResponse { IsExist = crmHelper.GetCrmIdByOutlookId(new TaskEntity { OutlookId = outlook.outlookId }) != Guid.Empty };
+            return JsonConvert.SerializeObject(appExist);
         }
 
         private bool InitializeHelpers()

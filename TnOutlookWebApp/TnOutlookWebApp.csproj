@@ -207,10 +207,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AppointmentEntity.cs" />
+    <Compile Include="Models\AttendeesResponse.cs" />
     <Compile Include="Models\CrmHelper.cs" />
     <Compile Include="Models\ExchangeHelper.cs" />
+    <Compile Include="Models\ExistResponse.cs" />
     <Compile Include="Models\IntegrationEntity.cs" />
     <Compile Include="Models\Outlook.cs" />
+    <Compile Include="Models\ResponseType.cs" />
     <Compile Include="Models\TaskEntity.cs" />
     <Compile Include="Models\TaskStatusCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -351,7 +354,6 @@
     <Content Include="Content\bootstrap-reboot.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
-    <None Include="Properties\PublishProfiles\AzureTaskAppWeb - Web Deploy.pubxml" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -368,6 +370,7 @@
     <Content Include="Scripts\esm\popper.js.map" />
     <Content Include="Scripts\esm\popper-utils.min.js.map" />
     <Content Include="Scripts\esm\popper-utils.js.map" />
+    <None Include="Properties\PublishProfiles\AzureTaskWebApp - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
